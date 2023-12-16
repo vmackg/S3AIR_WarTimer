@@ -1,0 +1,118 @@
+//# address-hook(0x02dae6) end(0x02dbc8)
+function void fn02dae6()
+{
+	playMusic(MUSIC_CTRL_FADEOUT)
+
+	Kosinski.addToDMAQueue(0x0d6a62, 0xa400)
+	if (global.zone_act != 0x1600 && global.act.apparent == 0)
+	{
+		// Any Act 1
+		A1 = 0x0d6d84
+		D0 = 0
+	}
+	else
+	{
+		// Any Act 2, incl. Lava Reef Boss Act
+		A1 = 0x0d6e46
+		D0 = 0xffffffff
+	}
+
+	u16[A0 + 0x2c] = D0.u16
+	Kosinski.addToDMAQueue(A1, 0xad00)
+
+	if (isMainCharacter(CHARACTER_SONIC))
+	{
+		// Sonic
+		A1 = 0x15b95c
+	}
+	else if (isMainCharacter(CHARACTER_TAILS))
+	{
+		// Tails - or Miles
+		A1 = (global.region_code & 0x80) ? 0x39ab6a : 0x39aa18
+	}
+	else
+	{
+		// Knuckles
+		A1 = 0x0d67f0
+	}
+	D2.u16 = (u16[A0 + 0x2c] != 0) ? 0xb400 : 0xaf00
+	Kosinski.addToDMAQueue(A1, D2.u16)
+
+	hud.dirty.timer = 0
+	u32 seconsds = timer.seconds + u32(timer.minutes) * 60
+	if (seconsds == 599)
+	{
+		// Special time bonus for 9:59
+		results.time_bonus = 1000000
+	}
+	else
+	{
+		// Time bonus			 S3AIR         
+		//  - 0:00 .. 0:59		-> 50.000       
+		//  - 1:00 .. 1:29		-> 10.000		
+		//  - 1:30 .. 1:59		-> 10.000		
+		//  - 2:00 .. 2:29		->  5.000		
+		//  - 2:30 .. 2:59		->  5.000		
+		//  - 3:00 .. 3:29		->  3.000		
+		//  - 3:30 .. 3:59		->  3.000		
+		//  - 4:00 .. 4:59		->  2.000		
+		//  - 5:00 .. 5:59		->  1.000		
+		//  - 6:00 .. 6:59		->    500		
+		//  - 7:00 .. 9:58		->      0		
+	
+	// edited from here
+	#if STANDALONE
+		if (seconsds < 60) // the bonuses are multiplied by 10 in game
+		{
+			results.time_bonus = 0
+			
+		}
+		else if (seconsds < 120)
+		{
+			results.time_bonus = 50
+			
+		}
+		else if (seconsds < 180)
+		{
+			results.time_bonus = 100
+			
+		}
+		else if (seconsds < 240)
+		{
+			results.time_bonus = 200
+			
+		}
+		else if (seconsds < 300)
+		{
+			results.time_bonus = 300
+			
+		}
+		else if (seconsds < 360)
+		{
+			results.time_bonus = 500
+			
+		}
+		else if (seconsds < 420)
+		{
+			results.time_bonus = 1000
+			
+		}
+		else
+		{
+			results.time_bonus = 1500
+			
+		}
+		// to here
+		
+	#else
+		u16 offset = min(seconsds / 30, 7)
+		results.time_bonus = u16[0x02deaa + offset * 2]
+	#endif
+	}
+
+	results.ring_bonus = u32(ring_counter) * 10
+	results.total_bonus = 0
+	objA0.countdown_value = 360
+	u16[A0 + 0x30] = 12
+	objA0.base_state += 2
+}

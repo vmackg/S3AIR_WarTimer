@@ -1,0 +1,8 @@
+{
+
+	
+
+	"hud_war_timer_frame_og":	{ "File": "timeframeog.png", "Rect": "0,0,195,70"},
+	"hud_war_timer_twodots_green":  {"File" : "PT_TWODOTS_GREEN.png", "Rect": "0,0,6,15"},
+	"hud_war_timer_twodots_red":  {"File" : "PT_TWODOTS_RED.png", "Rect": "0,0,6,15"}
+}

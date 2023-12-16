@@ -1,0 +1,128 @@
+function u64 Monitor.getIconSpriteKey(u8 type)
+{
+	return "monitor_icon_speedshoes"
+}
+
+//# address-hook(0x01d820) end(0x01d878)
+function void ItemEffect.UpdateDefaultInternal()
+{
+#if STANDALONE
+	if (u8[A0 + 0x49] != objA0.state)
+	{
+		// Go back from Classic Shield to original if player acquired a shield meanwhile
+		//  -> E.g. when opening two shield monitor quickly one after another
+		if (!Monitor.enforceClassicShield())
+		{
+			objA0.state = u8[A0 + 0x49]
+		}
+	}
+#endif
+
+	if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+	{
+		if (objA0.velocity.y < 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y += 0x18
+			return
+		}
+	}
+	else
+	{
+		if (objA0.velocity.y >= 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y -= 0x18
+			return
+		}
+	}
+
+	objA0.base_state += 2
+	u16[A0 + 0x24] = 0x1d
+
+	A1 = 0xffff0000 + u16[A0 + 0x42]
+	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece
+#if STANDALONE
+	if (objA0.state == 0x0b)	// Classic Shield
+	{
+		ItemEffect.applyShield(0, 0x0194ce, 0x3a)
+	}
+	else
+#endif
+	{
+		// Targets:
+		//  - 0x01d898	-> objA0.base_state = 0x01
+		//  - 0x01d890	-> objA0.base_state = 0x02
+		//  - 0x01d8ac	-> objA0.base_state = 0x03
+		//  - 0x01d90a	-> objA0.base_state = 0x04
+		//  - 0x01d954	-> objA0.base_state = 0x05
+		//  - 0x01d992	-> objA0.base_state = 0x06
+		//  - 0x01d9d0	-> objA0.base_state = 0x07
+		//  - 0x01da0e	-> objA0.base_state = 0x08
+		//  - 0x01da60	-> objA0.base_state = 0x09
+		call tableLookupAddress(0x01d87c, objA0.state * 2)
+	}
+}
+
+
+//# address-hook(0x01d898) end(0x01d8a6)
+function void ItemEffect.ApplyExtraLifePlayer1()
+{
+	++u16[0xfffffecc]
+	gainExtraLife()
+}
+
+
+//# address-hook(0x01d8ac) end(0x01d906)
+function void ItemEffect.ApplyExtraRings()
+{
+	monopen = 1
+}
+
+
+//# address-hook(0x01d90a) end(0x01d94e)
+function void ItemEffect.ApplySpeedUp()
+{
+	monopen = 1
+}
+
+
+function void ItemEffect.applyShield(u8 shieldType, u32 updateRoutine, u8 soundId)
+{
+	monopen = 1 //Seeing as how I replaced everytime this function is used, I shouldn't really need to change it, but I'll leave this here.
+}
+
+
+//# address-hook(0x01d954) end(0x01d990)
+function void ItemEffect.ApplyShieldFire()
+{
+	monopen = 1
+}
+
+
+//# address-hook(0x01d992) end(0x01d9ce)
+function void ItemEffect.ApplyShieldLightning()
+{
+	monopen = 1
+}
+
+
+//# address-hook(0x01d9d0) end(0x01da0c)
+function void ItemEffect.ApplyShieldBubble()
+{
+	monopen = 1
+}
+
+
+//# address-hook(0x01da0e) end(0x01da5e)
+function void ItemEffect.ApplyInvincibility()
+{
+	monopen = 1
+}
+
+
+//# address-hook(0x01da60) end(0x01db26)
+function void ItemEffect.ApplySuperTransformation()
+{
+	monopen = 1
+}

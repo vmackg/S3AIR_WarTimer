@@ -1,0 +1,7 @@
+{
+	
+	"CountDown_Boop": { "File": "Boop.ogg", "Type": "Sound" },
+	"WarMusic01": { "File": "PT_WAR_OST_01.ogg", "Type": "Music", "Name" : "ThousandMarch", "LoopStart" : "663798"},
+	"War_DeathSound": { "File": "deth.ogg", "Type": "Sound" },
+	"War_DeathExplosion": { "File": "explosionmultiple.ogg", "Type": "Sound" }
+}

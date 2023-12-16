@@ -1,0 +1,25 @@
+{
+
+	
+
+	"PT_DIGIT_RED_0":	{ "File": "WARNUMG0.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_1":	{ "File": "WARNUMG1.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_2":	{ "File": "WARNUMG2.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_3":	{ "File": "WARNUMG3.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_4":	{ "File": "WARNUMG4.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_5":	{ "File": "WARNUMG5.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_6":	{ "File": "WARNUMG6.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_7":	{ "File": "WARNUMG7.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_8":	{ "File": "WARNUMG8.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_RED_9":	{ "File": "WARNUMG9.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_0":	{ "File": "WARGREEN0.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_1":	{ "File": "WARGREEN1.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_2":	{ "File": "WARGREEN2.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_3":	{ "File": "WARGREEN3.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_4":	{ "File": "WARGREEN4.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_5":	{ "File": "WARGREEN5.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_6":	{ "File": "WARGREEN6.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_7":	{ "File": "WARGREEN7.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_8":	{ "File": "WARGREEN8.png", "Rect": "0,0,28,36" },
+	"PT_DIGIT_GREEN_9":	{ "File": "WARGREEN9.png", "Rect": "0,0,28,36" }
+}

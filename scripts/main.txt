@@ -1,0 +1,799 @@
+
+
+global u8 DoStartCoolDown = 1
+global u8 ResetAtTheEnd = 0
+global u8 ChooseInitialTime = 2
+global u8 ChooseMonitorReward = 3
+global bool DoCountDownSFX = 1
+global bool DeathSfx = 1 // 0 = off, 1 = default, 2 = srb2
+global bool IsBlocked = false // is in AIZ intro
+global bool CollectedRing = false
+global bool WorkWithRings = true
+global u8 ChSprites = 1
+global bool IsDead = false
+global u8 StartCoolDownTime = 1440
+global u8 StartCoolDownTimer = 0
+global u16 GreenFontTime = 480
+global u8 GreenFontTimer = 0
+global bool monopen = false
+global u16 monopen = 0 
+global u16 minutes
+global u16 seconds
+global u16 frames
+include mon
+include ModifiedTimeBonus
+include HandleMusic
+
+//# address-hook(0x02d804) end(0x02d854)
+function void TitleCard.Appear()
+{
+	if (u16[A0 + 0x34] != 0)
+	{
+		u16[A0 + 0x34] = 0
+		return
+	}
+
+	if (objA0.value3e != 0)
+	{
+		//from here 
+		if (ResetAtTheEnd)
+		{
+			timer.minutes = 0
+			timer.seconds = GetInitailTimerTime()	
+		}
+
+		// to here is edited
+		ring_counter = 0
+		player.total_rings = 0
+		extra_lives_granted = 0
+		timer.alldata.player2 = 0
+		ring_counter.player2 = 0
+		unused.player2.total_rings = 0
+		hud.dirty.timer = 0xff
+		hud.dirty.rings = 0xff
+		u8[0xffffb000 + 0x2c] = 30
+		u8[0xffffb04a + 0x2c] = 30
+		PlayMusicAfterLevelResults()
+	}
+
+	u16[A0 + 0x48] = 0
+	objA0.base_state += 2
+}
+
+function void Character.Initialization.shared(u8 character)
+{
+	StartCoolDownTimer = StartCoolDownTime
+
+	IsDead = false
+	timer.seconds = GetInitailTimerTime()
+	
+	base.Character.Initialization.shared(character)
+}
+
+
+#if STANDALONE
+function void HUD.drawDigit(u8 digit, u16 px, u16 py, u16 renderQueue, bool IsTime)
+{
+	if (IsTime)
+	{
+		if (DoGreenTiming())
+		{	
+			WriteFontRightCustom(digit, px, py, renderQueue)			
+		}	
+		else
+			WriteFontRightCustomRed(digit, px, py, renderQueue)
+					
+		
+	}
+	else
+	{
+		HUD.drawSprite(stringformat("hud_digit_%d", digit), px, py, renderQueue)
+	}
+	
+}
+#endif
+
+//# address-hook(0x010a94) end(0x010ae8)
+function void Character.BaseUpdate.Sonic()
+{		
+		if (char.control_flags == 0x53)
+		{
+			
+			IsBlocked = true
+			
+		}
+		else
+		{
+			IsBlocked = false
+		}
+		base.Character.BaseUpdate.Sonic()
+		
+}
+
+//# address-hook(0x010bba) end(0x010c8e)
+function void Character.UpdateNormalState.Sonic()
+{
+
+
+	CollectedRing = false
+	if (StartCoolDownTimer)
+		--StartCoolDownTimer
+	
+	if (!timer.seconds && !IsDead && !StartCoolDownTimer)		
+	{	
+		if (!timer.minutes)
+		{	
+			if (global.level_started)
+			{
+				IsDead = true
+			    timer.seconds = GetInitailTimerTime()
+				
+			}
+	
+		}
+
+	}
+	
+	
+	if (IsDead)
+	{
+		
+		//Character.Die_noSound()
+		GetCorrectDeathWSfx()
+	}
+
+	
+	
+	base.Character.UpdateNormalState.Sonic()
+}
+
+
+//# address-hook(0x01365c) end(0x0136b8)
+function void Character.BaseUpdate.Tails()
+{		
+		if (char.control_flags == 0x53)
+		{
+			
+			IsBlocked = true
+			
+		}
+		else
+		{
+			IsBlocked = false
+		}
+		base.Character.BaseUpdate.Tails()
+		
+}
+
+//# address-hook(0x0137c4) end(0x0138f4)
+function void Character.UpdateNormalState.Tails()
+{
+
+	CollectedRing = false
+	if (StartCoolDownTimer)
+		--StartCoolDownTimer
+	
+	if (!timer.seconds && !IsDead && !StartCoolDownTimer)		
+	{	
+		if (!timer.minutes)
+		{	
+			if (global.level_started)
+			{
+				IsDead = true
+			    timer.seconds = GetInitailTimerTime()
+				
+			}
+	
+		}
+
+	}
+	
+	
+	if (IsDead)
+	{
+		
+		//Character.Die_noSound()
+		GetCorrectDeathWSfx()
+	}
+
+	
+	
+	base.Character.UpdateNormalState.Tails()
+}
+
+
+//# address-hook(0x016444) end(0x016498)
+function void Character.BaseUpdate.Knuckles()
+{		
+		if (char.control_flags == 0x53)
+		{
+			
+			IsBlocked = true
+			
+		}
+		else
+		{
+			IsBlocked = false
+		}
+		base.Character.BaseUpdate.Knuckles()
+		
+}
+
+//# address-hook(0x01656c) end(0x016640)
+function void Character.UpdateNormalState.Knuckles()
+{
+
+
+	CollectedRing = false
+	if (StartCoolDownTimer)
+		--StartCoolDownTimer
+	
+	if (!timer.seconds && !IsDead && !StartCoolDownTimer)		
+	{	
+		if (!timer.minutes)
+		{	
+			if (global.level_started)
+			{
+				IsDead = true
+			    timer.seconds = GetInitailTimerTime()
+				
+			}
+	
+		}
+
+	}
+	
+	
+	if (IsDead)
+	{
+		
+		//Character.Die_noSound()
+		GetCorrectDeathWSfx()
+	}
+
+	
+	
+	base.Character.UpdateNormalState.Knuckles()
+}
+
+
+
+//custom hud
+function void RenderHUD()
+{
+#if STANDALONE
+	if (DEBUG_DISABLE_HUD)
+		return
+#endif
+
+	s16 baseX = global.level_started
+	if (baseX < 0)
+	{
+		baseX += 8
+		global.level_started = baseX
+	}
+	baseX += 0x0f
+	s16 baseY = 0x08
+	u16 renderQueue = 0xe000
+
+	bool isBonusStage = (global.zone >= 0x13 && global.zone <= 0x15)
+#if STANDALONE
+	if (!debug_mode.state)
+	{
+		if (!isBonusStage)
+		{
+			// Score
+			HUD.drawSprite("hud_text_score", baseX, baseY, renderQueue)
+			++renderQueue
+			HUD.drawNumber("hud_digit_%d", player.score * 10, baseX + 0x58, baseY, renderQueue)
+			++renderQueue
+			//edited here
+		if (global.level_started) 
+		{
+			
+			
+			if (ChSprites == 2)
+			{
+				HUD.drawSprite("hud_war_timer_frame_srbtwo", baseX - 20, 150, renderQueue)// the timer frame  srb2
+				++renderQueue
+			
+				if (DoGreenTiming())
+				{
+					HUD.drawSprite("SRB2_DIGIT_GREEN_DOT", baseX + 51, 163, renderQueue)
+					++renderQueue
+				}
+			}
+			else
+			{
+				HUD.drawSprite("hud_war_timer_frame_og", baseX - 20, 155, renderQueue)// the timer frame  srb2
+				++renderQueue
+			
+				if (!DoGreenTiming())
+				{
+					HUD.drawSprite("hud_war_timer_twodots_red", baseX + 91, 190, renderQueue)
+					++renderQueue
+				}	
+			}
+			
+		}
+			// Time
+			{
+
+
+				minutes = timer.minutes
+				seconds = timer.seconds
+				frames = timer.frames
+
+
+				
+				
+				
+				if (hud.dirty.timer && !global.game.paused && timer.alldata < 0x93b3b)	// That is 9:59 and 59 frames
+				{
+					if (!IsDead)
+					{
+				   ++frames
+					seconds += (frames / 60)
+					minutes += (seconds / 60)
+					frames %= 60
+					seconds %= 60					
+					}
+					else
+					{
+						seconds = 0
+						minutes = 0
+					}
+					
+				}
+
+				
+
+				//	if (minutes >= 10)
+					//	DoDigits(renderQueue, baseX, baseY)
+
+						if (ChSprites == 1)
+						{							
+							HUD.drawDigit(minutes / 10, baseX + 18, 180, renderQueue, true)
+							HUD.drawDigit(minutes % 10, baseX + 50, 180, renderQueue, true)
+							HUD.drawDigit(seconds / 10, baseX + 102, 180, renderQueue, true)
+							HUD.drawDigit(seconds % 10, baseX + 135, 180, renderQueue, true)
+						}						
+						
+					 	if (ChSprites == 2)
+						{
+							//HUD.drawDigit(minutes / 10, baseX , 160, renderQueue, true)
+							HUD.drawDigit(minutes % 10, baseX + 5, 160, renderQueue, true)
+							HUD.drawDigit(seconds / 10, baseX + 65, 160, renderQueue, true)
+							HUD.drawDigit(seconds % 10, baseX + 90, 160, renderQueue, true)	
+						}
+			
+					if (monopen)
+					{	
+						timer.seconds += GetMonitorReward()
+						monopen = false
+					}
+					
+
+			}
+			// to here
+		}
+
+		// Rings
+		{
+			u16 py = (isBonusStage) ? baseY : baseY + 0x20
+			bool show = (ring_counter != 0 || (level.framecounter & 0x08))
+			HUD.drawSprite(show ? "hud_text_rings" : "hud_text_rings_red", baseX, baseY + 0x10, renderQueue)
+			++renderQueue
+
+			u16 px = baseX + (!isBonusStage && Game.getSetting(SETTING_EXTENDED_HUD) ? 0x58 : 0x40)
+			for (u32 value = ring_counter;;)
+			{
+				HUD.drawDigit(value % 10, px, baseY + 0x10, renderQueue, false)
+				px -= 8
+				value /= 10
+				if (value == 0)
+					break
+			}
+			++renderQueue
+		}
+
+
+	}
+	else
+#endif
+	{
+		D4 = (isBonusStage) ? 8 : 0
+
+		if ((level.framecounter & 0x08) == 0)
+		{
+			if (ring_counter == 0)
+			{
+				D4 += 2
+			}
+			if (timer.minutes == 9 && !isBonusStage)
+			{
+				D4 += 4
+			}
+		}
+
+		// Targets:
+		//  - 0x00dbc2	-> D4.u16 = 0x00
+		//  - 0x00dc00	-> D4.u16 = 0x02
+		//  - 0x00dc32	-> D4.u16 = 0x04
+		//  - 0x00dc96	-> D4.u16 = 0x08
+		//  - 0x00dcb6	-> D4.u16 = 0x0a
+		A1 = tableLookupAddress(0x00dbb6, D4.u16)
+
+		D4.s16 = u16[A1] - 1
+		D0.s16 = baseX + 0x80
+		D1.u16 = 0x0108
+		D5.u16 = 0x86ca
+		A1 += 2
+		if (D4.s16 >= 0)
+		{
+			writeToSpriteTable(renderQueue)
+		}
+	}
+}
+
+//# address-hook(0x00dd06) end(0x00de86)
+function void UpdateTimeAndHud()
+{
+	if (competition_mode.active == 0)
+	{
+		if (debug_mode.state == 0)
+		{
+			// Update score
+			if (hud.dirty.score)
+			{
+				hud.dirty.score = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdc80)
+				D1 = player.score
+				RefreshScoreHudDisplay()
+			}
+
+			// Update rings
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+
+			// Update time
+			bool updateTimerHUD = false
+			if (hud.dirty.timer & 0x80)
+			{
+				hud.dirty.timer = 0x01
+				updateTimerHUD = true
+			}
+			else if (hud.dirty.timer != 0 && !global.game.paused)
+			{
+			#if STANDALONE
+				if (Game.getSetting(SETTING_INFINITE_TIME))
+				{
+					if (timer.alldata == 0x3b3b3b)		// That is 59:59 and 59 frames
+					{
+						// Reset back to 0
+						timer.alldata = 0
+					}
+				}
+				else
+			#endif
+				{
+					if (timer.alldata == 0x93b3b)		// That is 9:59 and 59 frames
+					{
+						// Time over
+						hud.dirty.timer = 0
+						A0 = 0xffffb000
+						if (objA0.base_state < 0x06 && global.zone != 0x15)
+						{
+							A2 = A0
+							Character.Die()
+						}
+						global.time_over = 1
+						return
+					}
+				}
+
+				// Time progress
+				++timer.frames
+				if (timer.frames >= 60)
+				{ //edited here
+					timer.frames = 0
+					if (!IsDead)
+					{
+						if (CanStartCountDown() )
+						{
+							--timer.seconds
+							HandleCountDownSound()
+						}
+							
+						
+					}
+					else
+					{
+						timer.seconds = 0
+					}
+					
+					if (timer.seconds <= 1 && !IsDead)
+					{
+						if (timer.minutes)
+						{
+							--timer.minutes
+							timer.seconds = 59
+						}
+					}						
+					if (timer.seconds >= 60)
+					{
+						
+						if (!IsDead)
+						{	
+							if (timer.seconds > 60)
+							{
+								timer.seconds = timer.seconds - 60
+							}
+								
+							
+							++timer.minutes
+						}
+						else
+						{
+							timer.minutes = 0
+						}
+						// to here
+						
+
+					#if STANDALONE
+						if (!Game.getSetting(SETTING_INFINITE_TIME))
+					#endif
+						{
+							timer.minutes = min(timer.minutes, 9)
+						}
+					}
+					updateTimerHUD = true
+				}
+			}
+
+			if (updateTimerHUD)
+			{
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+				D1 = min(timer.minutes, 9)
+				RefreshTimeMinutesHudDisplay()
+
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+				D1 = timer.seconds
+				RefreshTimeSecondsHudDisplay()
+			}
+
+			// Update lives
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+		}
+		else
+		{
+			// Debug mode
+			DebugModePositionDisplay()
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+
+			D0 = VDPHelper.getDirectVRAMWriteCode(0xde40)
+			D1 = global.lag_frames
+			RefreshTimeMinutesHudDisplay()
+
+			D0 = VDPHelper.getDirectVRAMWriteCode(0xdec0)
+			D1 = u8[0xfffff62c]
+			RefreshTimeSecondsHudDisplay()
+
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+
+			if (!global.game.paused)
+			{
+				A1 = 0xfffffe26
+				--A1
+				++u8[A1]
+				if (u8[A1] >= 60)
+				{
+					u8[A1] = 0
+					--A1
+					++u8[A1]
+					if (u8[A1] >= 60)
+					{
+						u8[A1] = 0
+						--A1
+						++u8[A1]
+						if (u8[A1] >= 9)
+						{
+							u8[A1] = 9
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (debug_mode.enabled)
+		{
+			DebugModePositionDisplay()
+		}
+	}
+}
+
+function bool DoGreenTiming()
+{
+	if (monopen || CollectedRing)
+	{
+		GreenFontTimer = GreenFontTime
+		
+	}
+	
+	while (GreenFontTimer)
+	{
+		--GreenFontTimer
+		return true
+	}
+	
+	
+		GreenFontTimer = 0
+		return false
+}
+
+function bool CanStartCountDown()
+{
+	if (char.control_flags == 0x53) // is in AIZ intro
+	{
+		return false
+	}
+	
+	else if (!DoStartCoolDown)
+	{
+		return true
+	}
+	else
+	{
+		while (StartCoolDownTimer)
+		{
+			return false
+		}
+		return true
+	}
+}
+
+function u8 GetInitailTimerTime()
+{
+	if (ChooseInitialTime == 1)
+	{
+		return 20
+	}
+	else if (ChooseInitialTime == 2)
+	{
+		return 30
+	}
+	else if (ChooseInitialTime == 3)
+	{
+		return 40
+	}
+	else
+	{
+		return 50
+	}
+}
+
+function void WriteFontRightCustom(u8 digit, u16 px, u16 py, u16 renderQueue)// what a name !!
+{
+	if (ChSprites == 1)
+	{
+		HUD.drawSprite(stringformat("PT_DIGIT_GREEN_%d", digit), px, py, renderQueue)
+	}
+	else
+		HUD.drawSprite(stringformat("SRB2_DIGIT_GREEN_%d", digit), px, py, renderQueue)
+}
+
+function void WriteFontRightCustomRed(u8 digit, u16 px, u16 py, u16 renderQueue)
+{
+	if (ChSprites == 1)
+	{
+		HUD.drawSprite(stringformat("PT_DIGIT_RED_%d", digit), px, py, renderQueue)
+	}
+	else
+		HUD.drawSprite(stringformat("SRB2_DIGIT_RED_%d", digit), px, py, renderQueue)
+}
+
+function void DoDigits(u16 renderq, u16 baseX, s16 baseY)
+{
+	if (ChSprites == 1)								
+		HUD.drawDigit(minutes / 10, baseX + 18, 180, renderq, true)
+		HUD.drawDigit(minutes % 10, baseX + 50, 180, renderq, true)
+		HUD.drawDigit(seconds / 10, baseX + 102, 180, renderq, true)
+		HUD.drawDigit(seconds % 10, baseX + 135, 180, renderq, true)
+}
+
+function u8 GetMonitorReward()
+{
+	if (ChooseMonitorReward == 1)
+	{
+		return 5
+	}
+	else if (ChooseMonitorReward == 2)
+	{
+		return 15
+	}
+	else if (ChooseMonitorReward == 3)
+	{
+		return 30
+	}
+	else
+	{
+		return 40
+	}
+}
+
+
+
+function void HandleCountDownSound()
+{
+	if (!IsBlocked)
+	{
+		if (DoCountDownSFX)
+		{
+			Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
+		}
+	}
+		
+}
+
+function void GetCorrectDeathWSfx()
+{
+	if (!DeathSfx)
+	{
+		Character.Die_noSound()
+	}
+	else if (DeathSfx == 1)
+	{
+		Character.Die()
+	}
+	else
+	{
+		Character.Die_noSound()
+		Audio.playAudio("War_DeathExplosion", AudioContext.CONTEXT_SOUND)
+		
+		
+	}
+}
+
+//# address-hook(0x01a596) end(0x01a5e8)
+function void CollectRing()
+{
+	
+	if (WorkWithRings)
+	{
+
+		++timer.seconds
+		CollectedRing = true
+
+	}
+	base.CollectRing()
+	
+}

@@ -1,0 +1,666 @@
+
+
+global u8 Wartimer.Option_SpriteStyle = 1 // 0 -> srb2, 1 -> pt
+//hmm, really sad there isn't S3AIR style.
+
+global bool Wartimer.IsCountdownActive = true
+
+global u16 Wartimer.InitialTime = 40 //In Seconds
+
+global u16 Wartimer.MonitorReward = 30
+
+global u16 Wartimer.GreenCharTimer = 0
+constant u8 Wartimer.GREENCHARTIME = 120 //frames, ofc
+
+global u8 WarTimer.Special.Time = 0 //ok the global variable thing is getting terrible
+
+global u8 Wartimer.Frames = 0
+global s8 Wartimer.Seconds = 0
+global s8 Wartimer.Minutes = 0
+
+global u8 Wartimer.Digit.Seconds.One = 0
+global u8 Wartimer.Digit.Seconds.Two = 0
+global u8 Wartimer.Digit.Minutes.One = 0
+global u8 Wartimer.Digit.Minutes.Two = 0
+
+#define Wartimer.DEBUG = 1
+
+function void Wartimer.UpdateTime()
+{
+	if (Wartimer.GreenCharTimer >= 1)
+		--Wartimer.GreenCharTimer
+	
+	if (global.zone_act == 0x0a01 || global.zone_act == 0x0c00)
+	{
+		WarTimer.UpdateTime.Special()
+		return
+	}
+	
+	if (Wartimer.Seconds >= 60) //update the Timer even if opened a monitor after the signpost appears
+	{
+		u8 modif = (Wartimer.Seconds / 60)
+		Wartimer.Seconds -= modif * 60
+		Wartimer.Minutes += modif
+	}
+	
+	
+	Wartimer.UpdateDigits()
+	
+	if (!Wartimer.IsCountdownActive)
+		return
+	
+	++Wartimer.Frames
+	if (Wartimer.Frames >= 60)
+	{
+		Wartimer.Frames = 0
+		Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
+		--Wartimer.Seconds
+	}
+	
+	
+	
+	
+	if (Wartimer.Seconds < 0)
+	{
+		if (Wartimer.Minutes < 1)
+		{
+			Wartimer.OnTimeOver()
+			return
+		}
+		Wartimer.Seconds = 59
+		--Wartimer.Minutes
+	}
+	
+	Wartimer.Minutes = clamp(Wartimer.Minutes, 0, 99) //another sketchy workaround !
+	
+	Wartimer.Minutes = Wartimer.Minutes < 0 ? 0 : Wartimer.Minutes
+	
+}
+
+//this function is really, REALLY messed up.
+function void WarTimer.UpdateTime.Special() // when in 0x0a01 or 0x0c00
+{
+	if (WarTimer.Special.Time == 0)
+	{
+		WarTimer.Special.Time = 20 - (System.rand() % 5)
+		
+		if (System.rand() % 2 == 1)
+			Wartimer.Digit.Minutes.One = System.rand() % 9
+		if (System.rand() % 2 == 1)
+			Wartimer.Digit.Minutes.Two = System.rand() % 9
+		
+		if (System.rand() % 2 == 1)
+			Wartimer.Digit.Seconds.One = System.rand() % 9
+		
+		if (System.rand() % 2 == 1)
+			Wartimer.Digit.Seconds.Two = System.rand() % 9
+		
+		if (System.rand() % 3 == 2)
+			Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
+		
+	}
+	
+	--WarTimer.Special.Time
+	
+	if (System.rand() % 50 == 15 && Wartimer.GreenCharTimer < 10)
+		Wartimer.GreenCharTimer = System.rand() % 50
+	
+	
+}
+
+function void Wartimer.UpdateDigits()
+{
+	Wartimer.Digit.Seconds.One = (Wartimer.Seconds % 10)
+	
+	Wartimer.Digit.Seconds.One = Wartimer.Digit.Seconds.One > 10 ? 0 : Wartimer.Digit.Seconds.One  //when the seconds become zero, the variable's value becomes 255 for a single frame.
+	//which could be bad
+	
+	Wartimer.Digit.Seconds.Two = Wartimer.Seconds / 10
+	
+	Wartimer.Digit.Minutes.One = Wartimer.Minutes % 10
+	
+	Wartimer.Digit.Minutes.Two = Wartimer.Minutes / 10
+	
+	
+	#if Wartimer.DEBUG > 0
+	debugLog(stringformat("Wartimer :: %d %d : %d %d",Wartimer.Digit.Minutes.Two ,Wartimer.Digit.Minutes.One, Wartimer.Digit.Seconds.Two, Wartimer.Digit.Seconds.One))
+	#endif
+}
+
+function void Wartimer.AddTimeBySeconds(u16 Seconds)
+{
+	u8 Minutes = 0
+	
+	if (Seconds >= 60)
+	{
+		u8 Modif = Seconds / 60
+		Seconds -= Modif * 60
+		Minutes += Modif
+	}
+	
+	Wartimer.Seconds += Seconds
+	Wartimer.Minutes += Minutes
+}
+
+function void Wartimer.SetTimeBySeconds(u16 Seconds)
+{
+	u8 Minutes
+	
+	if (Seconds >= 60)
+	{
+		u8 Modif = Seconds / 60
+		Seconds -= Modif * 60
+		Minutes += Modif
+	}
+	
+	Wartimer.Seconds = Seconds
+	Wartimer.Minutes = Minutes
+}
+
+function void Wartimer.OnTimeOver()
+{
+	Wartimer.IsCountdownActive = false
+	
+	#if Wartimer.DEBUG > 0
+	System.writeDisplayLine("Kaboom ! time's over.")
+	#endif
+	
+	Wartimer.GreenCharTimer = 0
+	Wartimer.Frames = 0
+	Wartimer.Seconds = 0
+	Wartimer.Minutes = 0
+	
+	u32 A0b = A0
+	A0 = 0xffffb000
+	Character.Die()
+	A0 = A0b
+	
+}
+
+function void Wartimer.DrawDigit(u8 Digit, u16 px, u16 py, u16 renderQueue)
+{
+	Digit = clamp(Digit, 0, 9)  // a lazy workaround
+	
+	//That's a """not""" so terrible desicion.
+	HUD.drawSprite(stringformat(stringformat(Wartimer.Option_SpriteStyle != 1 ? "SRB2_DIGIT_%s" : "PT_DIGIT_%s", Wartimer.GreenCharTimer != 0 ? "GREEN_%d" : "RED_%d"), Digit), px, py, renderQueue)
+}
+
+
+function void Wartimer.OnMonitorOpened()
+{
+	Wartimer.GreenCharTimer = Wartimer.GREENCHARTIME
+	Wartimer.AddTimeBySeconds(Wartimer.MonitorReward)
+}
+
+
+//# address-hook(0x010a94) end(0x010ae8)
+function void Character.BaseUpdate.Sonic()
+{
+	base.Character.BaseUpdate.Sonic()
+	
+	
+	#if Wartimer.DEBUG > 0
+	
+	if (Input.buttonPressed(BUTTON_Y))
+	{
+		
+		if (char.flags & char.flag.IN_AIR)
+			Wartimer.Option_SpriteStyle = Wartimer.Option_SpriteStyle == 0 ? 1 : 0
+		
+		Wartimer.GreenCharTimer = Wartimer.GreenCharTimer != 0 ? 0 : Wartimer.GREENCHARTIME
+		
+		Wartimer.AddTimeBySeconds(60)
+	}
+	
+	debugLog(stringformat("Wartimer :: Frames : %d, Seconds : %d, Minutes : %d", Wartimer.Frames, Wartimer.Seconds, Wartimer.Minutes))
+	debugLog(stringformat("Wartimer :: GreenCharTimer : %d", Wartimer.GreenCharTimer))
+	#endif
+}
+
+//# address-hook(0x006a76) end(0x006bd6)
+function void InitializeGameCharacters()
+{
+	base.InitializeGameCharacters()
+	
+	//the timer is activated in TitleCard.Appear()
+	
+	Wartimer.GreenCharTimer = 0
+	
+	Wartimer.Frames = 0
+	Wartimer.Seconds = 0
+	Wartimer.Minutes = 0
+	
+	Wartimer.SetTimeBySeconds(Wartimer.InitialTime)
+}
+
+//# address-hook(0x00db44) end(0x00dbb2)
+function void RenderHUD()
+{
+
+	if (DEBUG_DISABLE_HUD)
+		return
+
+	s16 baseX = global.level_started
+	if (baseX < 0)
+	{
+		baseX += 8
+		global.level_started = baseX
+	}
+	baseX += 0x0f
+	s16 baseY = 0x08
+	u16 renderQueue = 0xe000
+
+	bool isBonusStage = (global.zone >= 0x13 && global.zone <= 0x15)
+
+	if (!debug_mode.state)
+	{
+		if (!isBonusStage)
+		{
+			// Score
+			HUD.drawSprite("hud_text_score", baseX, baseY, renderQueue)
+			++renderQueue
+			HUD.drawNumber("hud_digit_%d", player.score * 10, baseX + 0x58, baseY, renderQueue)
+			++renderQueue
+		}
+		
+		// Rings
+		{
+			u16 py = (isBonusStage) ? baseY : baseY + 0x10
+			bool show = (ring_counter != 0 || (level.framecounter & 0x08))
+			HUD.drawSprite(show ? "hud_text_rings" : "hud_text_rings_red", baseX, py, renderQueue)
+			++renderQueue
+
+			u16 px = baseX + (!isBonusStage && Game.getSetting(SETTING_EXTENDED_HUD) ? 0x58 : 0x40)
+			for (u32 value = ring_counter;;)
+			{
+				HUD.drawDigit(value % 10, px, py, renderQueue)
+				px -= 8
+				value /= 10
+				if (value == 0)
+					break
+			}
+			++renderQueue
+		}
+		
+		//the timer
+		{
+			//the body
+			{
+				string BodyKey = ""
+				
+				s16 Body_OffsetX = 0
+				s16 Body_OffsetY = 0
+				
+				if (Wartimer.Option_SpriteStyle == 0)
+				{
+					BodyKey = "hud_war_timer_frame_srbtwo"
+					Body_OffsetX = -20
+					Body_OffsetY = 0
+				}
+				else
+				{
+					BodyKey = "hud_war_timer_frame_og"
+					Body_OffsetX = -15
+					Body_OffsetY = 5
+				}
+				
+				HUD.drawSprite(BodyKey, baseX + Body_OffsetX, 150 + Body_OffsetY, renderQueue)
+				++renderQueue
+			}
+			
+			//the time
+			{
+				Wartimer.UpdateTime()
+				
+				if (Wartimer.Option_SpriteStyle == 1) // pt
+				{
+					Wartimer.DrawDigit(Wartimer.Digit.Minutes.Two, baseX + 30, 180, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Minutes.One, baseX + 60, 180, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Seconds.Two, baseX + 102, 180, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Seconds.One, baseX + 135, 180, renderQueue)
+					++renderQueue
+					
+					if (Wartimer.GreenCharTimer != 0)
+					{
+						HUD.drawSprite("hud_war_timer_twodots_green", baseX + 96, 190, renderQueue)
+						++renderQueue
+					}
+					
+				}
+				else //srb2
+				{
+					Wartimer.DrawDigit(Wartimer.Digit.Minutes.Two, baseX - 10, 160, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Minutes.One, baseX + 15, 160, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Seconds.Two, baseX + 65, 160, renderQueue)
+					++renderQueue
+					Wartimer.DrawDigit(Wartimer.Digit.Seconds.One, baseX + 90, 160, renderQueue)
+					++renderQueue
+					
+					
+					if (Wartimer.GreenCharTimer != 0)
+					{
+						HUD.drawSprite("SRB2_DIGIT_GREEN_DOT", baseX + 51, 163, renderQueue)
+						++renderQueue
+					}
+				}
+				
+			}
+			
+		}
+
+
+		// Lives (not visible in Time Attack or with infinite lives setting)
+		if (!Game.isTimeAttack() && !Game.getSetting(SETTING_INFINITE_LIVES))
+		{
+			bool useMobilePosition = HUD.useMobileLivesDisplay()
+			u16 px = useMobilePosition ? (getScreenWidth() - baseX - 0x30) : baseX
+			u16 py = useMobilePosition ? baseY : 200
+
+			HUD.drawSprite(getCharacterLivesIcon(getMainCharacter()), px, py, renderQueue)
+			++renderQueue
+
+			if (lives_counter >= 10)
+				HUD.drawSmallDigit(u16((lives_counter / 10) % 10), px + 0x20, py + 8, renderQueue)
+			HUD.drawSmallDigit(u16(lives_counter % 10), px + 0x28, py + 8, renderQueue)
+		}
+	}
+	else
+
+	{
+		D4 = (isBonusStage) ? 8 : 0
+
+		if ((level.framecounter & 0x08) == 0)
+		{
+			if (ring_counter == 0)
+			{
+				D4 += 2		// Set rings HUD text to flicker
+			}
+			if (timer.minutes == 9 && !isBonusStage)
+			{
+				D4 += 4		// Set timer HUD text to flicker
+			}
+		}
+
+		// Targets:
+		//  - 0x00dbc2	-> D4.u16 = 0x00		// Complete HUD text
+		//  - 0x00dc00	-> D4.u16 = 0x02		// HUD with rings text flickering
+		//  - 0x00dc32	-> D4.u16 = 0x04		// HUD with time text flickering
+		//  - 0x00dc6a	-> D4.u16 = 0x06		// HUD with both rings and time flickering
+		//  - 0x00dc96	-> D4.u16 = 0x08		// Bonus stage HUD
+		//  - 0x00dcb6	-> D4.u16 = 0x0a		// Bonus stage HUD with rings text flickering
+		A1 = tableLookupAddress(0x00dbb6, D4.u16)
+
+		D4.s16 = u16[A1] - 1
+		D0.s16 = baseX + 0x80
+		D1.u16 = 0x0108
+		D5.u16 = 0x86ca
+		A1 += 2
+		if (D4.s16 >= 0)
+		{
+			writeToSpriteTable(renderQueue)
+		}
+	}
+}
+
+
+//# address-hook(0x00dd06) end(0x00de86)
+function void UpdateTimeAndHud() //just to get rid of the internal time progress
+{
+	if (competition_mode.active == 0)
+	{
+		if (debug_mode.state == 0)
+		{
+			// Update score
+			if (hud.dirty.score)
+			{
+				hud.dirty.score = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdc80)
+				D1 = player.score
+				RefreshScoreHudDisplay()
+			}
+
+			// Update rings
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+			
+			
+			// Update lives
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+		}
+		else
+		{
+			// Debug mode
+
+			// Draw position values over score
+			DebugModePositionDisplay()
+
+			// Update rings
+			if (hud.dirty.rings != 0)
+			{
+				if (hud.dirty.rings & 0x80)
+				{
+					ResetRingsDisplay()
+				}
+				hud.dirty.rings = 0
+				D0 = VDPHelper.getDirectVRAMWriteCode(0xdf40)
+				D1 = ring_counter
+				RefreshRingsHudDisplay()
+			}
+			
+			// Update lives
+			if (hud.dirty.lives != 0)
+			{
+				hud.dirty.lives = 0
+				UpdateHudLivesDisplay()
+			}
+		}
+	}
+	else
+	{
+		if (debug_mode.enabled)
+		{
+			DebugModePositionDisplay()
+		}
+	}
+}
+
+//# address-hook(0x0837d8) end(0x08382e)
+function void fn0837d8() //a.k.a. Signpost's Init function
+{
+	base.fn0837d8()
+	
+	Wartimer.IsCountdownActive = false
+}
+
+//# address-hook(0x08657a) end(0x0865cc)
+function void fn08657a() //a.k.a. the Capsule's Init function
+{
+	base.fn08657a()
+	
+	Wartimer.IsCountdownActive = false
+}
+
+//# address-hook(0x02d804) end(0x02d854)
+function void TitleCard.Appear() // Explainative enough
+{
+	base.TitleCard.Appear()
+
+	Wartimer.IsCountdownActive = true
+	
+	Wartimer.GreenCharTimer = 0
+	
+	Wartimer.Frames = 0
+	Wartimer.Seconds = 0
+	Wartimer.Minutes = 0
+	
+	Wartimer.SetTimeBySeconds(Wartimer.InitialTime)
+
+}
+
+
+function u64 Monitor.getIconSpriteKey(u8 type)
+{
+	if (objA0.state != 0x09)
+		return "WarTimer_Monitor"
+	
+	return base.Monitor.getIconSpriteKey(type)
+}
+
+//# address-hook(0x01d820) end(0x01d878)
+function void ItemEffect.UpdateDefaultInternal()
+{
+#if STANDALONE
+	if (u8[A0 + 0x49] != objA0.state)
+	{
+		// Go back from Classic Shield to original if player acquired a shield meanwhile
+		//  -> E.g. when opening two shield monitor quickly one after another
+		if (!Monitor.enforceClassicShield())
+		{
+			objA0.state = u8[A0 + 0x49]
+		}
+	}
+#endif
+
+	if ((objA0.render_flags & render_flag.FLIP_Y) == 0)
+	{
+		if (objA0.velocity.y < 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y += 0x18
+			return
+		}
+	}
+	else
+	{
+		if (objA0.velocity.y >= 0)
+		{
+			UpdateMovementStraightSimple()
+			objA0.velocity.y -= 0x18
+			return
+		}
+	}
+
+	objA0.base_state += 2
+	u16[A0 + 0x24] = 0x1d
+
+	A1 = 0xffff0000 + objA0.monitor.character_address
+	A2 = (A1 == 0xffffb000) ? 0xfffffecc : 0xfffffece		// Address to keep count of broken monitors in. having different ones for each player is a leftover from Sonic 2
+#if STANDALONE
+	if (objA0.state == 0x0b)	// Classic Shield
+	{
+		ItemEffect.applyShield(0, addressof(InstaShield.Init), SFX_CLASSICSHIELD)
+	}
+	else
+#endif
+	{
+		// Targets:
+		//  - 0x01d890	-> objA0.state = 0x00	-> Static, works like Robotnik
+		//  - 0x01d898	-> objA0.state = 0x01	-> Extra Life
+		//  - 0x01d890	-> objA0.state = 0x02	-> Robotnik
+		//  - 0x01d8ac	-> objA0.state = 0x03	-> Rings
+		//  - 0x01d90a	-> objA0.state = 0x04	-> Speed Shoes
+		//  - 0x01d954	-> objA0.state = 0x05	-> Fire Shield
+		//  - 0x01d992	-> objA0.state = 0x06	-> Lightning Shield
+		//  - 0x01d9d0	-> objA0.state = 0x07	-> Water Shield
+		//  - 0x01da0e	-> objA0.state = 0x08	-> Invincibility
+		//  - 0x01da60	-> objA0.state = 0x09	-> "Super" monitor (debug only)
+		
+		if (objA0.state == 0x09) //no cheating !
+		{
+			call tableLookupAddress(0x01d87c, objA0.state * 2)
+			return
+		}
+		
+		Wartimer.OnMonitorOpened()
+	}
+}
+
+/*
+Here is a poem by ChatGPT about what's wrong with this code, hope you enjoy
+"
+In the land of code, a script unfolds,
+A tale of challenges, a story untold.
+Wartimer's dance, a rhythm in strife,
+In the symphony of code, the problems are rife.
+
+Global variables, like shadows they cast,
+Yet confusion lurks, a problem amassed.
+Wartimer's SpriteStyle, a choice not clear,
+A source of potential bugs, bringing coding fear.
+
+Countdown active, but bugs in its wake,
+Inconsistencies arise, a challenge to break.
+InitialTime set, but time drifts away,
+Minutes and seconds, in disarray.
+
+GreenCharTimer, a timer's paradox,
+In its decrement, confusion knocks.
+Frames and digits, a ballet unsynchronized,
+Wartimer's challenges, in code baptized.
+
+UpdateDigits, a function with flaws,
+Numeric acrobatics, violating code laws.
+Debug logs scream, in the console's glow,
+A plea for clarity, as errors grow.
+
+AddTimeBySeconds, a function unsure,
+Minutes and seconds, their values obscure.
+SetTimeBySeconds, a journey unclear,
+Wartimer's struggles, in code appear.
+
+OnTimeOver's resolution, a resolution unclear,
+Countdown's demise, a problem sincere.
+Frames reset, but not time's embrace,
+In the code's theatre, bugs leave a trace.
+
+DrawDigit's performance, sprites out of place,
+In the canvas of code, errors interlace.
+Sprites and numbers, a visual mess,
+Wartimer's dilemma, a coding distress.
+
+OnMonitorOpened, a function's grace,
+Yet bugs emerge, disrupting the pace.
+Wartimer's reward, a glitchy affair,
+In the dance of errors, it's caught in the snare.
+
+Sonic's update, Wartimer's role,
+In the character's dance, a problematic stroll.
+InitializeGameCharacters, a prelude unclear,
+Wartimer's debut, a coding frontier.
+
+RenderHUD's ballet, a display unrefined,
+Digits and sprites, in chaos entwined.
+Wartimer's frame, a timepiece distraught,
+In the HUD's dance, where problems are sought.
+
+UpdateTimeAndHud, a tandem distressed,
+In the update dance, where errors infest.
+TitleCard's appearance, a curtain fraught,
+Wartimer's countdown, in a problem-laden thought.
+
+In this code's theatre, where problems reside,
+Wartimer's script, with challenges inside.
+Digits, timers, in S3AIR they wrestle,
+Wartimer's legacy, where bugs nestle.
+
+"
+
+*/
