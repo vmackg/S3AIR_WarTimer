@@ -1,10 +1,10 @@
 {
 	"Metadata":
 	{
-		"Name": "War Timer",
+		"Name": "War Timer Re-Write",
 		"Author": "Vamack",
-		"Description": "This Mod Adds the War Timer From Pizza Tower",
-		"ModVersion": "1.2.1"
+		"Description": "This is a Re-Write of a Mod that Adds the War Timer From Pizza Tower",
+		"ModVersion": "2.0 DEV"
 	},
 		"Settings":
 	{
@@ -14,131 +14,84 @@
 			
 				{
 				
-				"InternalName": "WarMode_CoolDown",
-				"DisplayName": "Start Delay",
-				"Variable": "DoStartCoolDown",
-				"DefaultValue": "1",
-				"Options":
-				{
-					"0": "off",
-					"1": "on",
-				}
+					"InternalName": "WarTimer_SpriteSyle",
+					"DisplayName": "Choose The Sprite Style",
+					"Variable": "WarTimer.Option.SpriteStyle",
+					"DefaultValue": "0",
+					"Options":
+					{
+						"0": "SRB2",
+						"1": "Pizza Tower",
+					}
 				
 				},
 				
 
 				{
 				
-				"InternalName": "WarMode_ResetafterFinish",
-				"DisplayName": "Reset at the end",
-				"Variable": "ResetAtTheEnd",
-				"DefaultValue": "1",
-				"Options":
-				{
-					"0": "off",
-					"1": "on",
+					"InternalName": "WarTimer_CountdownSFX",
+					"DisplayName": "Countdown SFX",
+					"Variable": "WarTimer.Option.CountdownSFX",
+					"DefaultValue": "1",
+					"Options":
+					{
+						"0": "off",
+						"1": "on",
 
-				}
+					}
 				
 				},
 				
 				
 				{
 				
-				"InternalName": "WarMode_TimerInitial",
-				"DisplayName": "Initial Time",
-				"Variable": "ChooseInitialTime",
-				"DefaultValue": "2",
-				"Options":
-				{
-					"1": "20",
-					"2": "30",
-					"3": "40",
-					"4": "50",
+					"InternalName": "WarTimer_TimerInitial",
+					"DisplayName": "Initial Time",
+					"Variable": "WarTimer.Option.InitialTime",
+					"DefaultValue": "30",
+					"Options":
+					{
+						"20": "20",
+						"30": "30",
+						"40": "40",
+						"50": "50",
 
-				}
+					}
 				
 				},
 				
 				{
 				
-				"InternalName": "WarMode_MonitorBonus",
-				"DisplayName": "Choose the Monitor Reward",
-				"Variable": "ChooseMonitorReward",
-				"DefaultValue": "3",
-				"Options":
-				{
-					"1": "5",
-					"2": "15",
-					"3": "30",
-					"4": "40",
+					"InternalName": "WarTimer_MonitorReward",
+					"DisplayName": "Choose the Monitor Reward",
+					"Variable": "WarTimer.Option.MonitorReward",
+					"DefaultValue": "30",
+					"Options":
+					{
+						"5": "5",
+						"15": "15",
+						"30": "30",
+						"40": "40",
 
-				}
+					}
 				
 				},
 				
 				{
 				
-				"InternalName": "WarMode_ChooseSprite",
-				"DisplayName": "Choose Theme",
-				"Variable": "ChSprites",
-				"DefaultValue": "1",
-				"Options":
-				{
-					"1": "Pizza Tower",
-					"2": "SRB2"
+					"InternalName": "WarTimer_SPECIAL",
+					"DisplayName": "Special in DDZ and Knux's SSZ",
+					"Variable": "WarTimer.Option.Special",
+					"DefaultValue": "1",
+					"Options":
+					{
+						"0": "off",
+						"1": "On"
 
+					}
+				
 				}
 				
-				},
-				
-				{
-				
-				"InternalName": "WarMode_CountDownSFX",
-				"DisplayName": "Count Down SFX",
-				"Variable": "DoCountDownSFX",
-				"DefaultValue": "1",
-				"Options":
-				{
-					"0": "Off",
-					"1": "On"
-
-				}
-				
-				},
-				
-				{
-				
-				"InternalName": "WarMode_DethSFX",
-				"DisplayName": "Death SFX",
-				"Variable": "DeathSfx",
-				"DefaultValue": "2",
-				"Options":
-				{
-					"0": "Off",
-					"1": "Default",
-					"2": "SRB2"
-
-				}
-				
-				},
-				
-				{
-				
-				"InternalName": "WarMode_ConsumeRings",
-				"DisplayName": "Use Rings",
-				"Variable": "WorkWithRings",
-				"DefaultValue": "0",
-				"Options":
-				{
-					"0": "Off",
-					"1": "On"
-
-				}
-				
-				}
-
-
 			
 		]
 		

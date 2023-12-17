@@ -1,133 +1,146 @@
 
+/* Options */
 
-global u8 Wartimer.Option_SpriteStyle = 1 // 0 -> srb2, 1 -> pt
+global u8 WarTimer.Option.SpriteStyle = 1 // 0 -> srb2, 1 -> pt
 //hmm, really sad there isn't S3AIR style.
 
-global bool Wartimer.IsCountdownActive = true
+global bool WarTimer.Option.CountdownSFX = true
 
-global u16 Wartimer.InitialTime = 40 //In Seconds
+global bool WarTimer.Option.Special = true
 
-global u16 Wartimer.MonitorReward = 30
+global u16 WarTimer.Option.InitialTime = 40 //In Seconds
 
-global u16 Wartimer.GreenCharTimer = 0
-constant u8 Wartimer.GREENCHARTIME = 120 //frames, ofc
+global u16 WarTimer.Option.MonitorReward = 30
 
-global u8 WarTimer.Special.Time = 0 //ok the global variable thing is getting terrible
+/* Options */
 
-global u8 Wartimer.Frames = 0
-global s8 Wartimer.Seconds = 0
-global s8 Wartimer.Minutes = 0
 
-global u8 Wartimer.Digit.Seconds.One = 0
-global u8 Wartimer.Digit.Seconds.Two = 0
-global u8 Wartimer.Digit.Minutes.One = 0
-global u8 Wartimer.Digit.Minutes.Two = 0
 
-#define Wartimer.DEBUG = 1
+global bool WarTimer.IsCountdownActive = true
 
-function void Wartimer.UpdateTime()
+global u16 WarTimer.GreenCharTimer = 0
+constant u8 WarTimer.GREENCHARTIME = 120 //frames, ofc
+
+global u8 WarTimer.Special.Time = 0 //ok the global variable thing is getting ridiculous
+
+global u8 WarTimer.Frames = 0
+global s8 WarTimer.Seconds = 0
+global s8 WarTimer.Minutes = 0
+
+global u8 WarTimer.Digit.Seconds.One = 0
+global u8 WarTimer.Digit.Seconds.Two = 0
+global u8 WarTimer.Digit.Minutes.One = 0
+global u8 WarTimer.Digit.Minutes.Two = 0
+
+#define WarTimer.DEBUG = 1
+
+function void WarTimer.UpdateTime()
 {
-	if (Wartimer.GreenCharTimer >= 1)
-		--Wartimer.GreenCharTimer
+	if (WarTimer.GreenCharTimer >= 1)
+		--WarTimer.GreenCharTimer
 	
 	if (global.zone_act == 0x0a01 || global.zone_act == 0x0c00)
 	{
-		WarTimer.UpdateTime.Special()
+		if (WarTimer.Option.Special)
+			WarTimer.UpdateTime.Special()
+		else
+			WarTimer.IsCountdownActive = 0
 		return
 	}
 	
-	if (Wartimer.Seconds >= 60) //update the Timer even if opened a monitor after the signpost appears
+	if (WarTimer.Seconds >= 60) //update the Timer even if opened a monitor after the signpost appears
 	{
-		u8 modif = (Wartimer.Seconds / 60)
-		Wartimer.Seconds -= modif * 60
-		Wartimer.Minutes += modif
+		u8 modif = (WarTimer.Seconds / 60)
+		WarTimer.Seconds -= modif * 60
+		WarTimer.Minutes += modif
 	}
 	
 	
-	Wartimer.UpdateDigits()
+	WarTimer.UpdateDigits()
 	
-	if (!Wartimer.IsCountdownActive)
+	if (!WarTimer.IsCountdownActive)
 		return
 	
-	++Wartimer.Frames
-	if (Wartimer.Frames >= 60)
+	++WarTimer.Frames
+	if (WarTimer.Frames >= 60)
 	{
-		Wartimer.Frames = 0
-		Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
-		--Wartimer.Seconds
+		WarTimer.Frames = 0
+		if (WarTimer.Option.CountdownSFX)
+			Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
+		--WarTimer.Seconds
 	}
 	
 	
 	
 	
-	if (Wartimer.Seconds < 0)
+	if (WarTimer.Seconds < 0)
 	{
-		if (Wartimer.Minutes < 1)
+		if (WarTimer.Minutes < 1)
 		{
-			Wartimer.OnTimeOver()
+			WarTimer.OnTimeOver()
 			return
 		}
-		Wartimer.Seconds = 59
-		--Wartimer.Minutes
+		WarTimer.Seconds = 59
+		--WarTimer.Minutes
 	}
 	
-	Wartimer.Minutes = clamp(Wartimer.Minutes, 0, 99) //another sketchy workaround !
+	WarTimer.Minutes = clamp(WarTimer.Minutes, 0, 99) //another sketchy workaround !
 	
-	Wartimer.Minutes = Wartimer.Minutes < 0 ? 0 : Wartimer.Minutes
+	WarTimer.Minutes = WarTimer.Minutes < 0 ? 0 : WarTimer.Minutes
 	
 }
 
 //this function is really, REALLY messed up.
-function void WarTimer.UpdateTime.Special() // when in 0x0a01 or 0x0c00
+function void WarTimer.UpdateTime.Special() // when in Knux's SSZ or DDZ
 {
 	if (WarTimer.Special.Time == 0)
 	{
 		WarTimer.Special.Time = 20 - (System.rand() % 5)
 		
 		if (System.rand() % 2 == 1)
-			Wartimer.Digit.Minutes.One = System.rand() % 9
+			WarTimer.Digit.Minutes.One = System.rand() % 9
 		if (System.rand() % 2 == 1)
-			Wartimer.Digit.Minutes.Two = System.rand() % 9
+			WarTimer.Digit.Minutes.Two = System.rand() % 9
 		
 		if (System.rand() % 2 == 1)
-			Wartimer.Digit.Seconds.One = System.rand() % 9
+			WarTimer.Digit.Seconds.One = System.rand() % 9
 		
 		if (System.rand() % 2 == 1)
-			Wartimer.Digit.Seconds.Two = System.rand() % 9
+			WarTimer.Digit.Seconds.Two = System.rand() % 9
 		
-		if (System.rand() % 3 == 2)
+		if (System.rand() % 3 == 2 && WarTimer.Option.CountdownSFX)
 			Audio.playAudio("CountDown_Boop", AudioContext.CONTEXT_SOUND)
 		
 	}
 	
 	--WarTimer.Special.Time
 	
-	if (System.rand() % 50 == 15 && Wartimer.GreenCharTimer < 10)
-		Wartimer.GreenCharTimer = System.rand() % 50
+	if (System.rand() % 50 == 15 && WarTimer.GreenCharTimer < 10)
+		WarTimer.GreenCharTimer = System.rand() % 50
 	
 	
 }
 
-function void Wartimer.UpdateDigits()
+function void WarTimer.UpdateDigits()
 {
-	Wartimer.Digit.Seconds.One = (Wartimer.Seconds % 10)
+	WarTimer.Digit.Seconds.One = (WarTimer.Seconds % 10)
 	
-	Wartimer.Digit.Seconds.One = Wartimer.Digit.Seconds.One > 10 ? 0 : Wartimer.Digit.Seconds.One  //when the seconds become zero, the variable's value becomes 255 for a single frame.
+	WarTimer.Digit.Seconds.One = WarTimer.Digit.Seconds.One > 10 ? 0 : WarTimer.Digit.Seconds.One  //when the seconds become zero, the variable's value becomes 255 for a single frame.
 	//which could be bad
 	
-	Wartimer.Digit.Seconds.Two = Wartimer.Seconds / 10
+	WarTimer.Digit.Seconds.Two = WarTimer.Seconds / 10
 	
-	Wartimer.Digit.Minutes.One = Wartimer.Minutes % 10
+	WarTimer.Digit.Minutes.One = WarTimer.Minutes % 10
 	
-	Wartimer.Digit.Minutes.Two = Wartimer.Minutes / 10
+	WarTimer.Digit.Minutes.Two = WarTimer.Minutes / 10
 	
 	
-	#if Wartimer.DEBUG > 0
-	debugLog(stringformat("Wartimer :: %d %d : %d %d",Wartimer.Digit.Minutes.Two ,Wartimer.Digit.Minutes.One, Wartimer.Digit.Seconds.Two, Wartimer.Digit.Seconds.One))
+	#if WarTimer.DEBUG > 0
+	debugLog(stringformat("WarTimer :: %d %d : %d %d",WarTimer.Digit.Minutes.Two ,WarTimer.Digit.Minutes.One, WarTimer.Digit.Seconds.Two, WarTimer.Digit.Seconds.One))
 	#endif
 }
 
-function void Wartimer.AddTimeBySeconds(u16 Seconds)
+function void WarTimer.AddTimeBySeconds(u16 Seconds)
 {
 	u8 Minutes = 0
 	
@@ -138,11 +151,11 @@ function void Wartimer.AddTimeBySeconds(u16 Seconds)
 		Minutes += Modif
 	}
 	
-	Wartimer.Seconds += Seconds
-	Wartimer.Minutes += Minutes
+	WarTimer.Seconds += Seconds
+	WarTimer.Minutes += Minutes
 }
 
-function void Wartimer.SetTimeBySeconds(u16 Seconds)
+function void WarTimer.SetTimeBySeconds(u16 Seconds)
 {
 	u8 Minutes
 	
@@ -153,22 +166,22 @@ function void Wartimer.SetTimeBySeconds(u16 Seconds)
 		Minutes += Modif
 	}
 	
-	Wartimer.Seconds = Seconds
-	Wartimer.Minutes = Minutes
+	WarTimer.Seconds = Seconds
+	WarTimer.Minutes = Minutes
 }
 
-function void Wartimer.OnTimeOver()
+function void WarTimer.OnTimeOver()
 {
-	Wartimer.IsCountdownActive = false
+	WarTimer.IsCountdownActive = false
 	
-	#if Wartimer.DEBUG > 0
+	#if WarTimer.DEBUG > 0
 	System.writeDisplayLine("Kaboom ! time's over.")
 	#endif
 	
-	Wartimer.GreenCharTimer = 0
-	Wartimer.Frames = 0
-	Wartimer.Seconds = 0
-	Wartimer.Minutes = 0
+	WarTimer.GreenCharTimer = 0
+	WarTimer.Frames = 0
+	WarTimer.Seconds = 0
+	WarTimer.Minutes = 0
 	
 	u32 A0b = A0
 	A0 = 0xffffb000
@@ -177,19 +190,19 @@ function void Wartimer.OnTimeOver()
 	
 }
 
-function void Wartimer.DrawDigit(u8 Digit, u16 px, u16 py, u16 renderQueue)
+function void WarTimer.DrawDigit(u8 Digit, u16 px, u16 py, u16 renderQueue)
 {
 	Digit = clamp(Digit, 0, 9)  // a lazy workaround
 	
 	//That's a """not""" so terrible desicion.
-	HUD.drawSprite(stringformat(stringformat(Wartimer.Option_SpriteStyle != 1 ? "SRB2_DIGIT_%s" : "PT_DIGIT_%s", Wartimer.GreenCharTimer != 0 ? "GREEN_%d" : "RED_%d"), Digit), px, py, renderQueue)
+	HUD.drawSprite(stringformat(stringformat(WarTimer.Option.SpriteStyle != 1 ? "SRB2_DIGIT_%s" : "PT_DIGIT_%s", WarTimer.GreenCharTimer != 0 ? "GREEN_%d" : "RED_%d"), Digit), px, py, renderQueue)
 }
 
 
-function void Wartimer.OnMonitorOpened()
+function void WarTimer.OnMonitorOpened()
 {
-	Wartimer.GreenCharTimer = Wartimer.GREENCHARTIME
-	Wartimer.AddTimeBySeconds(Wartimer.MonitorReward)
+	WarTimer.GreenCharTimer = WarTimer.GREENCHARTIME
+	WarTimer.AddTimeBySeconds(WarTimer.Option.MonitorReward)
 }
 
 
@@ -199,21 +212,22 @@ function void Character.BaseUpdate.Sonic()
 	base.Character.BaseUpdate.Sonic()
 	
 	
-	#if Wartimer.DEBUG > 0
+	#if WarTimer.DEBUG > 0
 	
 	if (Input.buttonPressed(BUTTON_Y))
 	{
 		
 		if (char.flags & char.flag.IN_AIR)
-			Wartimer.Option_SpriteStyle = Wartimer.Option_SpriteStyle == 0 ? 1 : 0
+			WarTimer.Option.SpriteStyle = WarTimer.Option.SpriteStyle == 0 ? 1 : 0
 		
-		Wartimer.GreenCharTimer = Wartimer.GreenCharTimer != 0 ? 0 : Wartimer.GREENCHARTIME
+		WarTimer.GreenCharTimer = WarTimer.GreenCharTimer != 0 ? 0 : WarTimer.GREENCHARTIME
 		
-		Wartimer.AddTimeBySeconds(60)
+		WarTimer.AddTimeBySeconds(60)
 	}
 	
-	debugLog(stringformat("Wartimer :: Frames : %d, Seconds : %d, Minutes : %d", Wartimer.Frames, Wartimer.Seconds, Wartimer.Minutes))
-	debugLog(stringformat("Wartimer :: GreenCharTimer : %d", Wartimer.GreenCharTimer))
+	debugLog(stringformat("WarTimer :: Frames : %d, Seconds : %d, Minutes : %d", WarTimer.Frames, WarTimer.Seconds, WarTimer.Minutes))
+	debugLog(stringformat("WarTimer :: GreenCharTimer : %d", WarTimer.GreenCharTimer))
+	
 	#endif
 }
 
@@ -224,13 +238,13 @@ function void InitializeGameCharacters()
 	
 	//the timer is activated in TitleCard.Appear()
 	
-	Wartimer.GreenCharTimer = 0
+	WarTimer.GreenCharTimer = 0
 	
-	Wartimer.Frames = 0
-	Wartimer.Seconds = 0
-	Wartimer.Minutes = 0
+	WarTimer.Frames = 0
+	WarTimer.Seconds = 0
+	WarTimer.Minutes = 0
 	
-	Wartimer.SetTimeBySeconds(Wartimer.InitialTime)
+	WarTimer.SetTimeBySeconds(WarTimer.Option.InitialTime)
 }
 
 //# address-hook(0x00db44) end(0x00dbb2)
@@ -282,7 +296,14 @@ function void RenderHUD()
 			++renderQueue
 		}
 		
-		//the timer
+		bool Disable_Special = ( global.zone_act == 0x0a01 || global.zone_act == 0x0c00 ) && !WarTimer.Option.Special
+		
+		#if WarTimer.DEBUG > 0
+		debugLog(stringformat("WarTimer :: Disable_Special : %d",Disable_Special))
+		#endif
+		
+		//the war timer
+		if (!Disable_Special)
 		{
 			//the body
 			{
@@ -291,7 +312,7 @@ function void RenderHUD()
 				s16 Body_OffsetX = 0
 				s16 Body_OffsetY = 0
 				
-				if (Wartimer.Option_SpriteStyle == 0)
+				if (WarTimer.Option.SpriteStyle == 0)
 				{
 					BodyKey = "hud_war_timer_frame_srbtwo"
 					Body_OffsetX = -20
@@ -310,20 +331,20 @@ function void RenderHUD()
 			
 			//the time
 			{
-				Wartimer.UpdateTime()
+				WarTimer.UpdateTime()
 				
-				if (Wartimer.Option_SpriteStyle == 1) // pt
+				if (WarTimer.Option.SpriteStyle == 1) // pt
 				{
-					Wartimer.DrawDigit(Wartimer.Digit.Minutes.Two, baseX + 30, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX + 30, 180, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Minutes.One, baseX + 60, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 60, 180, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Seconds.Two, baseX + 102, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 102, 180, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Seconds.One, baseX + 135, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 135, 180, renderQueue)
 					++renderQueue
 					
-					if (Wartimer.GreenCharTimer != 0)
+					if (WarTimer.GreenCharTimer != 0)
 					{
 						HUD.drawSprite("hud_war_timer_twodots_green", baseX + 96, 190, renderQueue)
 						++renderQueue
@@ -332,17 +353,17 @@ function void RenderHUD()
 				}
 				else //srb2
 				{
-					Wartimer.DrawDigit(Wartimer.Digit.Minutes.Two, baseX - 10, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX - 10, 160, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Minutes.One, baseX + 15, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 15, 160, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Seconds.Two, baseX + 65, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 65, 160, renderQueue)
 					++renderQueue
-					Wartimer.DrawDigit(Wartimer.Digit.Seconds.One, baseX + 90, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 90, 160, renderQueue)
 					++renderQueue
 					
 					
-					if (Wartimer.GreenCharTimer != 0)
+					if (WarTimer.GreenCharTimer != 0)
 					{
 						HUD.drawSprite("SRB2_DIGIT_GREEN_DOT", baseX + 51, 163, renderQueue)
 						++renderQueue
@@ -487,7 +508,7 @@ function void fn0837d8() //a.k.a. Signpost's Init function
 {
 	base.fn0837d8()
 	
-	Wartimer.IsCountdownActive = false
+	WarTimer.IsCountdownActive = false
 }
 
 //# address-hook(0x08657a) end(0x0865cc)
@@ -495,7 +516,7 @@ function void fn08657a() //a.k.a. the Capsule's Init function
 {
 	base.fn08657a()
 	
-	Wartimer.IsCountdownActive = false
+	WarTimer.IsCountdownActive = false
 }
 
 //# address-hook(0x02d804) end(0x02d854)
@@ -503,15 +524,15 @@ function void TitleCard.Appear() // Explainative enough
 {
 	base.TitleCard.Appear()
 
-	Wartimer.IsCountdownActive = true
+	WarTimer.IsCountdownActive = true
 	
-	Wartimer.GreenCharTimer = 0
+	WarTimer.GreenCharTimer = 0
 	
-	Wartimer.Frames = 0
-	Wartimer.Seconds = 0
-	Wartimer.Minutes = 0
+	WarTimer.Frames = 0
+	WarTimer.Seconds = 0
+	WarTimer.Minutes = 0
 	
-	Wartimer.SetTimeBySeconds(Wartimer.InitialTime)
+	WarTimer.SetTimeBySeconds(WarTimer.Option.InitialTime)
 
 }
 
@@ -589,7 +610,7 @@ function void ItemEffect.UpdateDefaultInternal()
 			return
 		}
 		
-		Wartimer.OnMonitorOpened()
+		WarTimer.OnMonitorOpened()
 	}
 }
 
@@ -598,12 +619,12 @@ Here is a poem by ChatGPT about what's wrong with this code, hope you enjoy
 "
 In the land of code, a script unfolds,
 A tale of challenges, a story untold.
-Wartimer's dance, a rhythm in strife,
+WarTimer's dance, a rhythm in strife,
 In the symphony of code, the problems are rife.
 
 Global variables, like shadows they cast,
 Yet confusion lurks, a problem amassed.
-Wartimer's SpriteStyle, a choice not clear,
+WarTimer's SpriteStyle, a choice not clear,
 A source of potential bugs, bringing coding fear.
 
 Countdown active, but bugs in its wake,
@@ -614,7 +635,7 @@ Minutes and seconds, in disarray.
 GreenCharTimer, a timer's paradox,
 In its decrement, confusion knocks.
 Frames and digits, a ballet unsynchronized,
-Wartimer's challenges, in code baptized.
+WarTimer's challenges, in code baptized.
 
 UpdateDigits, a function with flaws,
 Numeric acrobatics, violating code laws.
@@ -624,7 +645,7 @@ A plea for clarity, as errors grow.
 AddTimeBySeconds, a function unsure,
 Minutes and seconds, their values obscure.
 SetTimeBySeconds, a journey unclear,
-Wartimer's struggles, in code appear.
+WarTimer's struggles, in code appear.
 
 OnTimeOver's resolution, a resolution unclear,
 Countdown's demise, a problem sincere.
@@ -634,32 +655,32 @@ In the code's theatre, bugs leave a trace.
 DrawDigit's performance, sprites out of place,
 In the canvas of code, errors interlace.
 Sprites and numbers, a visual mess,
-Wartimer's dilemma, a coding distress.
+WarTimer's dilemma, a coding distress.
 
 OnMonitorOpened, a function's grace,
 Yet bugs emerge, disrupting the pace.
-Wartimer's reward, a glitchy affair,
+WarTimer's reward, a glitchy affair,
 In the dance of errors, it's caught in the snare.
 
-Sonic's update, Wartimer's role,
+Sonic's update, WarTimer's role,
 In the character's dance, a problematic stroll.
 InitializeGameCharacters, a prelude unclear,
-Wartimer's debut, a coding frontier.
+WarTimer's debut, a coding frontier.
 
 RenderHUD's ballet, a display unrefined,
 Digits and sprites, in chaos entwined.
-Wartimer's frame, a timepiece distraught,
+WarTimer's frame, a timepiece distraught,
 In the HUD's dance, where problems are sought.
 
 UpdateTimeAndHud, a tandem distressed,
 In the update dance, where errors infest.
 TitleCard's appearance, a curtain fraught,
-Wartimer's countdown, in a problem-laden thought.
+WarTimer's countdown, in a problem-laden thought.
 
 In this code's theatre, where problems reside,
-Wartimer's script, with challenges inside.
+WarTimer's script, with challenges inside.
 Digits, timers, in S3AIR they wrestle,
-Wartimer's legacy, where bugs nestle.
+WarTimer's legacy, where bugs nestle.
 
 "
 
