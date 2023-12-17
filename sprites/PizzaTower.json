@@ -1,0 +1,27 @@
+{
+	"hud_war_timer_frame_og":	{ "File": "PizzaTowerSprites.png", "Rect": "0,0,195,70"},
+	
+	"hud_war_timer_twodots_green":  {"File" : "PizzaTowerSprites.png", "Rect": "200,0,6,15"},
+	
+	"PT_DIGIT_RED_0":	{ "File": "PizzaTowerSprites.png", "Rect": "0,128,28,36" },
+	"PT_DIGIT_RED_1":	{ "File": "PizzaTowerSprites.png", "Rect": "29,128,28,36" },
+	"PT_DIGIT_RED_2":	{ "File": "PizzaTowerSprites.png", "Rect": "58,128,28,36" },
+	"PT_DIGIT_RED_3":	{ "File": "PizzaTowerSprites.png", "Rect": "87,128,28,36" },
+	"PT_DIGIT_RED_4":	{ "File": "PizzaTowerSprites.png", "Rect": "116,128,28,36" },
+	"PT_DIGIT_RED_5":	{ "File": "PizzaTowerSprites.png", "Rect": "145,128,28,36" },
+	"PT_DIGIT_RED_6":	{ "File": "PizzaTowerSprites.png", "Rect": "174,128,28,36" },
+	"PT_DIGIT_RED_7":	{ "File": "PizzaTowerSprites.png", "Rect": "203,128,28,36" },
+	"PT_DIGIT_RED_8":	{ "File": "PizzaTowerSprites.png", "Rect": "232,128,28,36" },
+	"PT_DIGIT_RED_9":	{ "File": "PizzaTowerSprites.png", "Rect": "261,128,28,36" },
+	"PT_DIGIT_GREEN_0":	{ "File": "PizzaTowerSprites.png", "Rect": "0,200,28,36" },
+	"PT_DIGIT_GREEN_1":	{ "File": "PizzaTowerSprites.png", "Rect": "29,200,28,36" },
+	"PT_DIGIT_GREEN_2":	{ "File": "PizzaTowerSprites.png", "Rect": "58,200,28,36" },
+	"PT_DIGIT_GREEN_3":	{ "File": "PizzaTowerSprites.png", "Rect": "87,200,28,36" },
+	"PT_DIGIT_GREEN_4":	{ "File": "PizzaTowerSprites.png", "Rect": "116,200,28,36" },
+	"PT_DIGIT_GREEN_5":	{ "File": "PizzaTowerSprites.png", "Rect": "145,200,28,36" },
+	"PT_DIGIT_GREEN_6":	{ "File": "PizzaTowerSprites.png", "Rect": "174,200,28,36" },
+	"PT_DIGIT_GREEN_7":	{ "File": "PizzaTowerSprites.png", "Rect": "203,200,28,36" },
+	"PT_DIGIT_GREEN_8":	{ "File": "PizzaTowerSprites.png", "Rect": "232,200,28,36" },
+	"PT_DIGIT_GREEN_9":	{ "File": "PizzaTowerSprites.png", "Rect": "261,200,28,36" }
+	
+}

@@ -1,0 +1,26 @@
+{
+	"hud_war_timer_frame_srbtwo":	{ "File": "SRB2Sprites.png", "Rect": "0,0,146,78" },
+	
+	"SRB2_DIGIT_GREEN_0":	{ "File": "SRB2Sprites.png", "Rect": "0,106,27,30" },
+	"SRB2_DIGIT_GREEN_1":	{ "File": "SRB2Sprites.png", "Rect": "28,106,27,30" },
+	"SRB2_DIGIT_GREEN_2":	{ "File": "SRB2Sprites.png", "Rect": "56,106,27,30" },
+	"SRB2_DIGIT_GREEN_3":	{ "File": "SRB2Sprites.png", "Rect": "84,106,27,30" },
+	"SRB2_DIGIT_GREEN_4":	{ "File": "SRB2Sprites.png", "Rect": "112,106,27,30" },
+	"SRB2_DIGIT_GREEN_5":	{ "File": "SRB2Sprites.png", "Rect": "140,106,27,30" },
+	"SRB2_DIGIT_GREEN_6":	{ "File": "SRB2Sprites.png", "Rect": "168,106,27,30" },
+	"SRB2_DIGIT_GREEN_7":	{ "File": "SRB2Sprites.png", "Rect": "196,106,27,30" },
+	"SRB2_DIGIT_GREEN_8":	{ "File": "SRB2Sprites.png", "Rect": "224,106,27,30" },
+	"SRB2_DIGIT_GREEN_9":	{ "File": "SRB2Sprites.png", "Rect": "252,106,27,30" },
+	"SRB2_DIGIT_GREEN_DOT":	{ "File": "SRB2Sprites.png", "Rect": "165,0,5,24" },
+	"SRB2_DIGIT_RED_0":	{ "File": "SRB2Sprites.png", "Rect": "0,173,27,30" },
+	"SRB2_DIGIT_RED_1":	{ "File": "SRB2Sprites.png", "Rect": "28,173,27,30" },
+	"SRB2_DIGIT_RED_2":	{ "File": "SRB2Sprites.png", "Rect": "56,173,27,30" },
+	"SRB2_DIGIT_RED_3":	{ "File": "SRB2Sprites.png", "Rect": "84,173,27,30" },
+	"SRB2_DIGIT_RED_4":	{ "File": "SRB2Sprites.png", "Rect": "112,173,27,30" },
+	"SRB2_DIGIT_RED_5":	{ "File": "SRB2Sprites.png", "Rect": "140,173,27,30" },
+	"SRB2_DIGIT_RED_6":	{ "File": "SRB2Sprites.png", "Rect": "168,173,27,30" },
+	"SRB2_DIGIT_RED_7":	{ "File": "SRB2Sprites.png", "Rect": "196,173,27,30" },
+	"SRB2_DIGIT_RED_8":	{ "File": "SRB2Sprites.png", "Rect": "224,173,27,30" },
+	"SRB2_DIGIT_RED_9":	{ "File": "SRB2Sprites.png", "Rect": "252,173,27,30" },
+	
+}
