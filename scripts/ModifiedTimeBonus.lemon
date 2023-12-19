@@ -39,37 +39,24 @@ function void fn02dae6()
 	Kosinski.addToDMAQueue(A1, D2.u16)
 
 	hud.dirty.timer = 0
-	u32 seconsds = timer.seconds + u32(timer.minutes) * 60
+	u32 seconsds = WarTimer.Seconds + WarTimer.Minutes * 60
 	if (seconsds == 599)
 	{
 		// Special time bonus for 9:59
-		results.time_bonus = 1000000
+		results.time_bonus = 100000
 	}
 	else
-	{
-		// Time bonus			 S3AIR         
-		//  - 0:00 .. 0:59		-> 50.000       
-		//  - 1:00 .. 1:29		-> 10.000		
-		//  - 1:30 .. 1:59		-> 10.000		
-		//  - 2:00 .. 2:29		->  5.000		
-		//  - 2:30 .. 2:59		->  5.000		
-		//  - 3:00 .. 3:29		->  3.000		
-		//  - 3:30 .. 3:59		->  3.000		
-		//  - 4:00 .. 4:59		->  2.000		
-		//  - 5:00 .. 5:59		->  1.000		
-		//  - 6:00 .. 6:59		->    500		
-		//  - 7:00 .. 9:58		->      0		
+	{	
 	
-	// edited from here
 	#if STANDALONE
 		if (seconsds < 60) // the bonuses are multiplied by 10 in game
 		{
-			results.time_bonus = 0
+			results.time_bonus = 50
 			
 		}
 		else if (seconsds < 120)
 		{
-			results.time_bonus = 50
+			results.time_bonus = 100
 			
 		}
 		else if (seconsds < 180)
@@ -79,37 +66,44 @@ function void fn02dae6()
 		}
 		else if (seconsds < 240)
 		{
-			results.time_bonus = 200
+			results.time_bonus = 300
 			
 		}
 		else if (seconsds < 300)
 		{
-			results.time_bonus = 300
+			results.time_bonus = 1000
 			
 		}
 		else if (seconsds < 360)
 		{
-			results.time_bonus = 500
+			results.time_bonus = 1500
 			
 		}
 		else if (seconsds < 420)
 		{
-			results.time_bonus = 1000
+			results.time_bonus = 2500
+			
+		}
+		else if (seconsds < 600)
+		{
+			results.time_bonus = 5000
 			
 		}
 		else
 		{
-			results.time_bonus = 1500
-			
+			results.time_bonus = 10000
 		}
-		// to here
 		
 	#else
 		u16 offset = min(seconsds / 30, 7)
 		results.time_bonus = u16[0x02deaa + offset * 2]
 	#endif
 	}
-
+	
+	#if WarTimer.DEBUG > 0
+	debugLog(stringformat("WarTimer :: ResultsTimeBonus : %d", results.time_bonus * 10))
+	#endif
+	
 	results.ring_bonus = u32(ring_counter) * 10
 	results.total_bonus = 0
 	objA0.countdown_value = 360

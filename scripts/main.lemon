@@ -34,6 +34,8 @@ global u8 WarTimer.Digit.Minutes.Two = 0
 
 #define WarTimer.DEBUG = 1
 
+include ModifiedTimeBonus
+
 function void WarTimer.UpdateTime()
 {
 	if (WarTimer.GreenCharTimer >= 1)
