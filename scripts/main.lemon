@@ -1,4 +1,79 @@
 
+/*
+Here is a poem by ChatGPT about what's wrong with this code, hope you enjoy
+"
+In the land of code, a script unfolds,
+A tale of challenges, a story untold.
+WarTimer's dance, a rhythm in strife,
+In the symphony of code, the problems are rife.
+
+Global variables, like shadows they cast,
+Yet confusion lurks, a problem amassed.
+WarTimer's SpriteStyle, a choice not clear,
+A source of potential bugs, bringing coding fear.
+
+Countdown active, but bugs in its wake,
+Inconsistencies arise, a challenge to break.
+InitialTime set, but time drifts away,
+Minutes and seconds, in disarray.
+
+GreenCharTimer, a timer's paradox,
+In its decrement, confusion knocks.
+Frames and digits, a ballet unsynchronized,
+WarTimer's challenges, in code baptized.
+
+UpdateDigits, a function with flaws,
+Numeric acrobatics, violating code laws.
+Debug logs scream, in the console's glow,
+A plea for clarity, as errors grow.
+
+AddTimeBySeconds, a function unsure,
+Minutes and seconds, their values obscure.
+SetTimeBySeconds, a journey unclear,
+WarTimer's struggles, in code appear.
+
+OnTimeOver's resolution, a resolution unclear,
+Countdown's demise, a problem sincere.
+Frames reset, but not time's embrace,
+In the code's theatre, bugs leave a trace.
+
+DrawDigit's performance, sprites out of place,
+In the canvas of code, errors interlace.
+Sprites and numbers, a visual mess,
+WarTimer's dilemma, a coding distress.
+
+OnMonitorOpened, a function's grace,
+Yet bugs emerge, disrupting the pace.
+WarTimer's reward, a glitchy affair,
+In the dance of errors, it's caught in the snare.
+
+Sonic's update, WarTimer's role,
+In the character's dance, a problematic stroll.
+InitializeGameCharacters, a prelude unclear,
+WarTimer's debut, a coding frontier.
+
+RenderHUD's ballet, a display unrefined,
+Digits and sprites, in chaos entwined.
+WarTimer's frame, a timepiece distraught,
+In the HUD's dance, where problems are sought.
+
+UpdateTimeAndHud, a tandem distressed,
+In the update dance, where errors infest.
+TitleCard's appearance, a curtain fraught,
+WarTimer's countdown, in a problem-laden thought.
+
+In this code's theatre, where problems reside,
+WarTimer's script, with challenges inside.
+Digits, timers, in S3AIR they wrestle,
+WarTimer's legacy, where bugs nestle.
+
+"
+
+*/
+
+
+
+
 /* Options */
 
 global u8 WarTimer.Option.SpriteStyle = 1 // 0 -> srb2, 1 -> pt
@@ -34,7 +109,7 @@ global u8 WarTimer.Digit.Seconds.Two = 0
 global u8 WarTimer.Digit.Minutes.One = 0
 global u8 WarTimer.Digit.Minutes.Two = 0
 
-#define WarTimer.DEBUG = 1
+#define WarTimer.DEBUG = 0
 
 include ModifiedTimeBonus
 
@@ -628,74 +703,3 @@ function void ItemEffect.UpdateDefaultInternal()
 	}
 }
 
-/*
-Here is a poem by ChatGPT about what's wrong with this code, hope you enjoy
-"
-In the land of code, a script unfolds,
-A tale of challenges, a story untold.
-WarTimer's dance, a rhythm in strife,
-In the symphony of code, the problems are rife.
-
-Global variables, like shadows they cast,
-Yet confusion lurks, a problem amassed.
-WarTimer's SpriteStyle, a choice not clear,
-A source of potential bugs, bringing coding fear.
-
-Countdown active, but bugs in its wake,
-Inconsistencies arise, a challenge to break.
-InitialTime set, but time drifts away,
-Minutes and seconds, in disarray.
-
-GreenCharTimer, a timer's paradox,
-In its decrement, confusion knocks.
-Frames and digits, a ballet unsynchronized,
-WarTimer's challenges, in code baptized.
-
-UpdateDigits, a function with flaws,
-Numeric acrobatics, violating code laws.
-Debug logs scream, in the console's glow,
-A plea for clarity, as errors grow.
-
-AddTimeBySeconds, a function unsure,
-Minutes and seconds, their values obscure.
-SetTimeBySeconds, a journey unclear,
-WarTimer's struggles, in code appear.
-
-OnTimeOver's resolution, a resolution unclear,
-Countdown's demise, a problem sincere.
-Frames reset, but not time's embrace,
-In the code's theatre, bugs leave a trace.
-
-DrawDigit's performance, sprites out of place,
-In the canvas of code, errors interlace.
-Sprites and numbers, a visual mess,
-WarTimer's dilemma, a coding distress.
-
-OnMonitorOpened, a function's grace,
-Yet bugs emerge, disrupting the pace.
-WarTimer's reward, a glitchy affair,
-In the dance of errors, it's caught in the snare.
-
-Sonic's update, WarTimer's role,
-In the character's dance, a problematic stroll.
-InitializeGameCharacters, a prelude unclear,
-WarTimer's debut, a coding frontier.
-
-RenderHUD's ballet, a display unrefined,
-Digits and sprites, in chaos entwined.
-WarTimer's frame, a timepiece distraught,
-In the HUD's dance, where problems are sought.
-
-UpdateTimeAndHud, a tandem distressed,
-In the update dance, where errors infest.
-TitleCard's appearance, a curtain fraught,
-WarTimer's countdown, in a problem-laden thought.
-
-In this code's theatre, where problems reside,
-WarTimer's script, with challenges inside.
-Digits, timers, in S3AIR they wrestle,
-WarTimer's legacy, where bugs nestle.
-
-"
-
-*/
