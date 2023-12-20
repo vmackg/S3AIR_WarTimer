@@ -26,6 +26,20 @@
 				
 				},
 				
+				{
+				
+					"InternalName": "WarTimer_TimerPos",
+					"DisplayName": "Choose The Timer's Position",
+					"Variable": "WarTimer.Option.TimerPos",
+					"DefaultValue": "0",
+					"Options":
+					{
+						"0": "Left",
+						"1": "Middle",
+						"2": "Right",
+					}
+				
+				},
 
 				{
 				

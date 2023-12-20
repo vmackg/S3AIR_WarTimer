@@ -8,6 +8,8 @@ global bool WarTimer.Option.CountdownSFX = true
 
 global bool WarTimer.Option.Special = true
 
+global u8 WarTimer.Option.TimerPos = 2 //0 -> left, 1 -> Middle, 2 -> Right
+
 global u16 WarTimer.Option.InitialTime = 40 //In Seconds
 
 global u16 WarTimer.Option.MonitorReward = 30
@@ -222,7 +224,7 @@ function void Character.BaseUpdate.Sonic()
 		if (char.flags & char.flag.IN_AIR)
 			WarTimer.Option.SpriteStyle = WarTimer.Option.SpriteStyle == 0 ? 1 : 0
 		
-		WarTimer.GreenCharTimer = WarTimer.GreenCharTimer != 0 ? 0 : WarTimer.GREENCHARTIME
+		WarTimer.GreenCharTimer = 120
 		
 		WarTimer.AddTimeBySeconds(60)
 	}
@@ -307,6 +309,10 @@ function void RenderHUD()
 		//the war timer
 		if (!Disable_Special)
 		{
+			u16 TimerOffset_Option = 0 //peak naming conventions
+			//this isn't an option, it's the offset 'caused by your choices of the TimerPos Option
+			//again peak naming conventions
+			
 			//the body
 			{
 				string BodyKey = ""
@@ -319,15 +325,21 @@ function void RenderHUD()
 					BodyKey = "hud_war_timer_frame_srbtwo"
 					Body_OffsetX = -20
 					Body_OffsetY = 0
+					
+					TimerOffset_Option = WarTimer.Option.TimerPos ? (WarTimer.Option.TimerPos == 1 ? 125 : 256) : 0
 				}
 				else
 				{
 					BodyKey = "hud_war_timer_frame_og"
 					Body_OffsetX = -15
 					Body_OffsetY = 5
+					
+					TimerOffset_Option = WarTimer.Option.TimerPos ? (WarTimer.Option.TimerPos == 1 ? 100 : 204) : 0
 				}
 				
-				HUD.drawSprite(BodyKey, baseX + Body_OffsetX, 150 + Body_OffsetY, renderQueue)
+					
+				
+				HUD.drawSprite(BodyKey, baseX + Body_OffsetX + TimerOffset_Option, 150 + Body_OffsetY, renderQueue)
 				++renderQueue
 			}
 			
@@ -337,37 +349,37 @@ function void RenderHUD()
 				
 				if (WarTimer.Option.SpriteStyle == 1) // pt
 				{
-					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX + 30, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX + 30 + TimerOffset_Option, 180, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 60, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 60 + TimerOffset_Option, 180, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 102, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 102 + TimerOffset_Option, 180, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 135, 180, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 135 + TimerOffset_Option, 180, renderQueue)
 					++renderQueue
 					
 					if (WarTimer.GreenCharTimer != 0)
 					{
-						HUD.drawSprite("hud_war_timer_twodots_green", baseX + 96, 190, renderQueue)
+						HUD.drawSprite("hud_war_timer_twodots_green", baseX + 96 + TimerOffset_Option, 190, renderQueue)
 						++renderQueue
 					}
 					
 				}
 				else //srb2
 				{
-					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX - 10, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.Two, baseX - 10 + TimerOffset_Option, 160, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 15, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Minutes.One, baseX + 15 + TimerOffset_Option, 160, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 65, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.Two, baseX + 65 + TimerOffset_Option, 160, renderQueue)
 					++renderQueue
-					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 90, 160, renderQueue)
+					WarTimer.DrawDigit(WarTimer.Digit.Seconds.One, baseX + 90 + TimerOffset_Option, 160, renderQueue)
 					++renderQueue
 					
 					
 					if (WarTimer.GreenCharTimer != 0)
 					{
-						HUD.drawSprite("SRB2_DIGIT_GREEN_DOT", baseX + 51, 163, renderQueue)
+						HUD.drawSprite("SRB2_DIGIT_GREEN_DOT", baseX + 51 + TimerOffset_Option, 163, renderQueue)
 						++renderQueue
 					}
 				}
